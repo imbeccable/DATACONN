@@ -1,6 +1,7 @@
 let raindrops = []
 let resp;
-console.log(navigator);
+let x;
+let y;
 let device;
 
 function makeApiCall(){
@@ -83,17 +84,21 @@ function noteOn(note) {
 function noteOff(note) {
     console.log(`note: ${note} // off`);
 
+    setXnY(note);
+    console.log(`lon = ${sessionStorage.getItem("lon")}`) 
+    console.log(`lat = ${sessionStorage.getItem("lat")}`) 
+
     if (note < 52) {
-        addLongitude(10);
+        // addLongitude(10);
         makeApiCall();
     } else if (note > 51 && note < 68) {
-        subLongitude(10)
+        // subLongitude(10)
         makeApiCall();
     } else if (note > 68 && note < 84) {
-        addLat(10);
+        // addLat(10);
         makeApiCall();     
     } else {
-        subLat(10);
+        // subLat(10);
         makeApiCall();
     }
 
@@ -121,9 +126,11 @@ class rain {
 //
 function waves(resp,note) {
     dew = resp["main"]["humidity"];
+    var rand_city = pops[Math.floor(Math.random()*pops.length)]
+    setLonLat(rand_city["Lon"],rand_city["Lat"]);
+    console.log(rand_city)
     i=0;
-    for (i;i<dew;i+5) {
-        console.log("works")
+    for (i;i<dew;i+=5) {
         if (note < 52) {
             raindrops.push(new rain(i+5,20,dew/2,5))
         } else if (note > 51 && note < 68) {
@@ -162,11 +169,144 @@ function changeDisplay(resp){
 
 }
 
-function initializeLonLat(){
-    startLongitude = 50.0;
-    startLattitude = 50.0;
-    sessionStorage.setItem("lon", startLongitude); 
-    sessionStorage.setItem("lat", startLattitude); 
+function setXnY(note) {
+
+    if (note == 36) {
+        x = windowWidth/8;
+        y = windowHeight - windowHeight/8
+    } else if (note == 37) {
+        x = windowWidth/7;
+        y = windowHeight - windowHeight/8        
+    } else if (note == 38) {
+        x = windowWidth/6;
+        y = windowHeight - windowHeight/8
+    } else if (note == 39) {
+        x = windowWidth/5;
+        y = windowHeight - windowHeight/8
+    } else if (note == 40) {
+        
+    } else if (note == 41) {
+        
+    } else if (note == 42) {
+        
+    } else if (note == 43) {
+        
+    } else if (note == 44) {
+        
+    } else if (note == 45) {
+        
+    } else if (note == 46) {
+        
+    } else if (note == 47) {
+        
+    } else if (note == 48) {
+        
+    } else if (note == 49) {
+        
+    } else if (note == 50) {
+        
+    } else if (note == 51) {
+        
+    } else if (note == 52) {
+        
+    } else if (note == 53) {
+        
+    } else if (note == 54) {
+        
+    } else if (note == 55) {
+        
+    } else if (note == 56) {
+        
+    } else if (note == 57) {
+        
+    } else if (note == 58) {
+        
+    } else if (note == 59) {
+        
+    } else if (note == 60) {
+        
+    } else if (note == 61) {
+        
+    } else if (note == 62) {
+        
+    } else if (note == 63) {
+        
+    } else if (note == 64) {
+        
+    } else if (note == 65) {
+        
+    } else if (note == 66) {
+        
+    } else if (note == 67) {
+        
+    } else if (note == 68) {
+        
+    } else if (note == 69) {
+        
+    } else if (note == 70) {
+        
+    } else if (note == 71) {
+        
+    } else if (note == 72) {
+        
+    } else if (note == 73) {
+        
+    } else if (note == 74) {
+        
+    } else if (note == 75) {
+        
+    } else if (note == 76) {
+        
+    } else if (note == 77) {
+        
+    } else if (note == 78) {
+        
+    } else if (note == 79) {
+        
+    } else if (note == 80) {
+        
+    } else if (note == 81) {
+        
+    } else if (note == 82) {
+        
+    } else if (note == 83) {
+        
+    } else if (note == 84) {
+        
+    } else if (note == 85) {
+        
+    } else if (note == 86) {
+        
+    } else if (note == 87) {
+        
+    } else if (note == 89) {
+        
+    } else if (note == 90) {
+        
+    } else if (note == 91) {
+        
+    } else if (note == 92) {
+        
+    } else if (note == 93) {
+        
+    } else if (note == 94) {
+        
+    } else if (note == 95) {
+        
+    } else if (note == 96) {
+        
+    } else if (note == 97) {
+        
+    } else if (note == 98) {
+        
+    } else {
+        
+    } 
+}
+
+function setLonLat(lon,lat){
+    sessionStorage.setItem("lon", lon); 
+    sessionStorage.setItem("lat", lat); 
 }
 
 // each key adds or subtracts from long and lat

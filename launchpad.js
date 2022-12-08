@@ -2,6 +2,8 @@ let raindrops = []
 let resp;
 let x;
 let y;
+let dew;
+let color;
 let device;
 
 function makeApiCall(){
@@ -9,8 +11,10 @@ function makeApiCall(){
     weatherKey = "bbd2f62f057e3b871240349153b66cfe"
     lat = sessionStorage.getItem("lat") 
     lon = sessionStorage.getItem("lon") 
+    d = sessionStorage.getItem("dew");
     weatherParams = {"lat": lat,
                     "lon": lon,
+                    "dew": d,
                     "units": "imperial",
                     "appid": weatherKey
                     }
@@ -62,12 +66,10 @@ function success(midiAccess) {
 }
 
 function handleInput(input) {
-    let command = input.data[0];
     let note = input.data[1];
     let velocity = input.data[2];
 
     if (velocity > 0) {
-        // console.log(`command: ${command}, node: ${note}, velocity: ${velocity}`);
         noteOn(note);
     }
     if (velocity == 0) {
@@ -85,100 +87,72 @@ function noteOff(note) {
     console.log(`note: ${note} // off`);
 
     setXnY(note);
-    console.log(`lon = ${sessionStorage.getItem("lon")}`) 
-    console.log(`lat = ${sessionStorage.getItem("lat")}`) 
 
-    if (note < 52) {
-        // addLongitude(10);
-        makeApiCall();
-    } else if (note > 51 && note < 68) {
-        // subLongitude(10)
-        makeApiCall();
-    } else if (note > 68 && note < 84) {
-        // addLat(10);
-        makeApiCall();     
-    } else {
-        // subLat(10);
-        makeApiCall();
-    }
+    makeApiCall();
 
-    waves(resp,note);
+    waves(resp);
 }
 
-class rain {
-    constructor(x,y,d,speed) {
-        this.x = x;
-        this.y = y;
-        this.d = d;
-        this.speed = speed;
-    }
-    
+// a class for displaying the visuals
+class rain {    
     display() {
-        // fill(0,0,255);
-        // circle(x,y,d);
-
         var canvas = document.getElementById('circle');
+        var humidity;
         if (canvas.getContext) {
             var ctx = canvas.getContext('2d');
-            var R = 20;
             ctx.beginPath();
-            ctx.arc(x, y, R, 0, 2 * Math.PI, false);
-            ctx.lineWidth = 3;
-            ctx.strokeStyle = '#FF0000';
+            humidity = sessionStorage.getItem("dew")
+            ctx.arc(x, y, humidity, 0, 2 * Math.PI, false);
+            ctx.lineWidth = humidity/6;
+            ctx.strokeStyle = color;
             ctx.stroke();
         }
     }
-
-    move() {
-        this.x += this.speed;
-    }
 }
 
-//
-function waves(resp,note) {
+// finds the humidity
+function setDew(resp){
     dew = resp["main"]["humidity"];
-    var rand_city = pops[Math.floor(Math.random()*pops.length)]
-    setLonLat(rand_city["Lon"],rand_city["Lat"]);
-    console.log(rand_city)
-    i=0;
-    for (i;i<dew;i+=5) {
-        if (note < 52) {
-            raindrops.push(new rain(i+5,20,dew/2,5))
-        } else if (note > 51 && note < 68) {
-            raindrops.push(new rain(i+5,40,dew/2,5))
-        } else if (note > 68 && note < 84) {
-            raindrops.push(new rain(i+5,60,dew/2,5)) 
-        } else {
-            raindrops.push(new rain(i+5,80,dew/2,5))
-        }
-    }
-
-    for (i=0;i<raindrops.length;i++) {
-        raindrops[i].display();
-        raindrops[i].move();
-    }
+    sessionStorage.setItem("dew",dew);
 }
 
+// finds a random city in the pops.js file and sets the new longitude and latitude
+// then finds the humidity and creates a new visual based on those values
+function waves(resp) {
+    var rand_city = pops[Math.floor(Math.random()*pops.length)]
+    setLonLat(rand_city["Lon"],rand_city["Lat"]);   
+    setDew(resp); 
+    raindrops.push(new rain());
+
+    i = 0;
+    for (i;i<raindrops.length;i++) {
+        raindrops[i].display();
+    }
+    
+}
+
+// finds temperature and wind speed at the given longitude and latitude
 function parseWeather(resp){
     temp = resp["main"]["temp"]
     windSpeed = resp["wind"]["speed"]
-    console.log(`temp in farinheight = ${temp}\n wind speed in mph = ${windSpeed}`)
     return [temp, windSpeed];
 }
 
+// scales the proper temp
 function scaleProperly(number, inMin, inMax, outMin, outMax) {
     return (number - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
 }
 
+// changes the current color of the visual
 function changeDisplay(resp){
     let [temp, windSpeed] = parseWeather(resp);
     properTemp = scaleProperly(temp, 0, 120, 0, 255); 
     properWindspeed = scaleProperly(windSpeed,0,8,0,100);
-
-    document.body.style.backgroundColor = `rgb(${properTemp},50,50)`;
-
+    document.body.style.backgroundColor = "black";
+    color = `rgb(75,75,${properTemp})`;
 }
 
+// sets the x and y coordinates for each controller key
 function setXnY(note) {
 
     if (note == 36) {
@@ -376,38 +350,8 @@ function setXnY(note) {
     } 
 }
 
+// sets the longitude and latitude into the session storage
 function setLonLat(lon,lat){
     sessionStorage.setItem("lon", lon); 
     sessionStorage.setItem("lat", lat); 
 }
-
-// each key adds or subtracts from long and lat
-
-function addLongitude(number){
-    previousLon = parseFloat(sessionStorage.getItem("lon"))
-    newLon = previousLon + number;
-    sessionStorage.setItem("lon", newLon);
-    console.log(`new lon = ${sessionStorage.getItem("lon")}`)   
-}
-
-function subLongitude(number){
-    previousLon = parseFloat(sessionStorage.getItem("lon"))
-    newLon = previousLon - number;
-    sessionStorage.setItem("lon", newLon);
-    console.log(`new lon = ${sessionStorage.getItem("lon")}`)   
-}
-
-function addLat(number){
-    previousLon = parseFloat(sessionStorage.getItem("lat"))
-    newLat = previousLon + number;
-    sessionStorage.setItem("lat", newLat);
-    console.log(`new lat = ${sessionStorage.getItem("lat")}`)   
-}
-
-function subLat(number){
-    previousLon = parseFloat(sessionStorage.getItem("lat"))
-    newLat = previousLon - number;
-    sessionStorage.setItem("lat", newLat);
-    console.log(`new lat = ${sessionStorage.getItem("lat")}`)   
-}
-

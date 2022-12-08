@@ -1,15 +1,16 @@
 
-
 function makeApiCall(){
     url = "https://api.openweathermap.org/data/2.5/weather?"
     weatherKey = "bbd2f62f057e3b871240349153b66cfe"
     lat = sessionStorage.getItem("lat") 
     lon = sessionStorage.getItem("lon") 
+    dew = sessionStorage.getItem("current.dew_point")
     weatherParams = {"lat": lat,
-                        "lon": lon,
-                        "units": "imperial",
-                        "appid": weatherKey
-                        }
+                    "lon": lon,
+                    "dew": dew,
+                    "units": "imperial",
+                    "appid": weatherKey
+                    }
     console.log(weatherParams)
 
 

@@ -1,6 +1,5 @@
 let raindrops = []
 let resp;
-
 console.log(navigator);
 let device;
 
